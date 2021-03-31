@@ -1,7 +1,7 @@
 #include "typewise-alert.h"
 #include <stdio.h>
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
+BreachType BMS_Alerter::inferBreach(double value, double lowerLimit, double upperLimit) {
   if(value < lowerLimit) {
     return TOO_LOW;
   }
@@ -11,61 +11,30 @@ BreachType inferBreach(double value, double lowerLimit, double upperLimit) {
   return NORMAL;
 }
 
-BreachType classifyTemperatureBreach(
-    CoolingType coolingType, double temperatureInC) {
-  int lowerLimit = 0;
-  int upperLimit = 0;
-  switch(coolingType) {
-    case PASSIVE_COOLING:
-      lowerLimit = 0;
-      upperLimit = 35;
-      break;
-    case HI_ACTIVE_COOLING:
-      lowerLimit = 0;
-      upperLimit = 45;
-      break;
-    case MED_ACTIVE_COOLING:
-      lowerLimit = 0;
-      upperLimit = 40;
-      break;
-  }
-  return inferBreach(temperatureInC, lowerLimit, upperLimit);
+BreachType BMS_Alerter::classifyTemperatureBreach(CoolingType coolingType, double temperatureInC) {
+
+  auto limits = map_cooling[coolingType];
+  return inferBreach(temperatureInC, limits.first, limits.second);
 }
 
-void checkAndAlert(
-    AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC) {
 
-  BreachType breachType = classifyTemperatureBreach(
-    batteryChar.coolingType, temperatureInC
-  );
 
-  switch(alertTarget) {
-    case TO_CONTROLLER:
-      sendToController(breachType);
-      break;
-    case TO_EMAIL:
-      sendToEmail(breachType);
-      break;
-  }
+void BMS_Alerter::checkAndAlert(ILogger &logger, BatteryCharacter batteryChar, double temperatureInC) 
+{
+  logger.log_data(classifyTemperatureBreach(batteryChar.coolingType, temperatureInC));
 }
 
-void sendToController(BreachType breachType) {
-  const unsigned short header = 0xfeed;
-  printf("%x : %x\n", header, breachType);
+void ControllerLogger::log_data(BreachType breachType)
+{
+    const unsigned short header = 0xfeed;
+    printf("%x : %x\n", header, breachType);
 }
 
-void sendToEmail(BreachType breachType) {
-  const char* recepient = "a.b@c.com";
-  switch(breachType) {
-    case TOO_LOW:
-      printf("To: %s\n", recepient);
-      printf("Hi, the temperature is too low\n");
-      break;
-    case TOO_HIGH:
-      printf("To: %s\n", recepient);
-      printf("Hi, the temperature is too high\n");
-      break;
-    case NORMAL:
-      break;
-  }
+void EmailLogger::log_data(BreachType breachType)
+{
+    const char* recepient = "a.b@c.com";
+
+    std::cout << "To: " << recepient << "\n";
+    std::cout<< map_breach_message[breachType] << "\n";
+
 }
