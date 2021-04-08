@@ -1,4 +1,8 @@
 #pragma once
+#include <iostream>
+#include <map>
+
+
 
 typedef enum {
   PASSIVE_COOLING,
@@ -12,8 +16,6 @@ typedef enum {
   TOO_HIGH
 } BreachType;
 
-BreachType inferBreach(double value, double lowerLimit, double upperLimit);
-BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
 
 typedef enum {
   TO_CONTROLLER,
@@ -25,8 +27,47 @@ typedef struct {
   char brand[48];
 } BatteryCharacter;
 
-void checkAndAlert(
-  AlertTarget alertTarget, BatteryCharacter batteryChar, double temperatureInC);
 
-void sendToController(BreachType breachType);
-void sendToEmail(BreachType breachType);
+class ILogger
+{
+public:
+	virtual void log_data(BreachType breachType) = 0;
+};
+
+class ControllerLogger : public ILogger
+{
+public:
+	virtual void log_data(BreachType breachType);
+
+};
+
+class EmailLogger : public ILogger
+{
+	
+public:
+	virtual void log_data(BreachType breachType);
+
+};
+
+class Console : public ILogger
+{
+
+public:
+	virtual void log_data(BreachType breachType);
+
+};
+
+class BMS_Alerter
+{
+	std::map<CoolingType, std::pair<double, double>> map_cooling = 
+	{	{ PASSIVE_COOLING ,std::make_pair(0,35) },
+		{ HI_ACTIVE_COOLING ,std::make_pair(0,45) },
+		{ MED_ACTIVE_COOLING ,std::make_pair(0,40) }
+	};
+
+	BreachType inferBreach(double value, double lowerLimit, double upperLimit);
+	BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
+
+public:
+	BreachType checkAndAlert(ILogger& logger, BatteryCharacter batteryChar, double temperatureInC);
+};
