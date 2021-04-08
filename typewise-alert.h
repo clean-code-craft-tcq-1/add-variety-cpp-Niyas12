@@ -2,6 +2,8 @@
 #include <iostream>
 #include <map>
 
+
+
 typedef enum {
   PASSIVE_COOLING,
   HI_ACTIVE_COOLING,
@@ -26,7 +28,6 @@ typedef struct {
 } BatteryCharacter;
 
 
-
 class ILogger
 {
 public:
@@ -42,13 +43,7 @@ public:
 
 class EmailLogger : public ILogger
 {
-	std::map<BreachType, std::string> map_breach_message =
-	{ 
-	{TOO_LOW ,"Hi, the temperature is too low" },
-	{TOO_HIGH ,"Hi, the temperature is too high" },
-	{NORMAL ,"Hi, the temperature is Normal" }
-	};
-
+	
 public:
 	virtual void log_data(BreachType breachType);
 
@@ -56,12 +51,6 @@ public:
 
 class Console : public ILogger
 {
-	std::map<BreachType, std::string> map_breach_message =
-	{
-	{TOO_LOW ,"Hi, the temperature is too low" },
-	{TOO_HIGH ,"Hi, the temperature is too high" },
-	{NORMAL ,"Hi, the temperature is Normal" }
-	};
 
 public:
 	virtual void log_data(BreachType breachType);

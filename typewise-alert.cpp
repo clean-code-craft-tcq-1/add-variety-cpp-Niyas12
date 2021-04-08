@@ -1,6 +1,19 @@
 #include "typewise-alert.h"
 #include <stdio.h>
 
+std::map<BreachType, std::string> map_breach_message =
+{
+{TOO_LOW ,"Hi, the temperature is too low" },
+{TOO_HIGH ,"Hi, the temperature is too high" },
+{NORMAL ,"Hi, the temperature is Normal" }
+};
+
+std::map<CoolingType, std::pair<double, double>> map_cooling =
+{ { PASSIVE_COOLING ,std::make_pair(0,35) },
+    { HI_ACTIVE_COOLING ,std::make_pair(0,45) },
+    { MED_ACTIVE_COOLING ,std::make_pair(0,40) }
+};
+
 BreachType BMS_Alerter::inferBreach(double value, double lowerLimit, double upperLimit) {
   if(value < lowerLimit) {
     return TOO_LOW;
