@@ -19,9 +19,12 @@ BreachType BMS_Alerter::classifyTemperatureBreach(CoolingType coolingType, doubl
 
 
 
-void BMS_Alerter::checkAndAlert(ILogger &logger, BatteryCharacter batteryChar, double temperatureInC) 
+BreachType BMS_Alerter::checkAndAlert(ILogger &logger, BatteryCharacter batteryChar, double temperatureInC)
 {
-  logger.log_data(classifyTemperatureBreach(batteryChar.coolingType, temperatureInC));
+    auto  breach = classifyTemperatureBreach(batteryChar.coolingType, temperatureInC);
+    logger.log_data(breach);
+
+    return breach;
 }
 
 void ControllerLogger::log_data(BreachType breachType)
@@ -36,5 +39,9 @@ void EmailLogger::log_data(BreachType breachType)
 
     std::cout << "To: " << recepient << "\n";
     std::cout<< map_breach_message[breachType] << "\n";
+}
 
+void Console::log_data(BreachType breachType)
+{
+    std::cout << map_breach_message[breachType] << "\n";
 }

@@ -8,10 +8,13 @@ TEST_CASE("infers the breach according to limits") {
 	EmailLogger email;
 	BatteryCharacter battery_char;
 	battery_char.coolingType = PASSIVE_COOLING;
-	alerter.checkAndAlert(email, battery_char, 40.0);
-	alerter.checkAndAlert(email, battery_char, -1.0);
-	alerter.checkAndAlert(email, battery_char, 5.0);
+	REQUIRE(alerter.checkAndAlert(email, battery_char, 40.0) == TOO_HIGH);
+	REQUIRE(alerter.checkAndAlert(email, battery_char, -1.0) == TOO_LOW);
+	REQUIRE(alerter.checkAndAlert(email, battery_char, 5.0) == NORMAL);
 
 	ControllerLogger controller;
-	alerter.checkAndAlert(controller, battery_char, 40.0);
+	REQUIRE(alerter.checkAndAlert(controller, battery_char, 40.0) == TOO_HIGH);
+
+	Console console;
+	REQUIRE(alerter.checkAndAlert(console, battery_char, 40.0) == TOO_HIGH);
 }

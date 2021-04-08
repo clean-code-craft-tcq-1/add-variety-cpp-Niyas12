@@ -54,6 +54,20 @@ public:
 
 };
 
+class Console : public ILogger
+{
+	std::map<BreachType, std::string> map_breach_message =
+	{
+	{TOO_LOW ,"Hi, the temperature is too low" },
+	{TOO_HIGH ,"Hi, the temperature is too high" },
+	{NORMAL ,"Hi, the temperature is Normal" }
+	};
+
+public:
+	virtual void log_data(BreachType breachType);
+
+};
+
 class BMS_Alerter
 {
 	std::map<CoolingType, std::pair<double, double>> map_cooling = 
@@ -66,5 +80,5 @@ class BMS_Alerter
 	BreachType classifyTemperatureBreach(CoolingType coolingType, double temperatureInC);
 
 public:
-	void checkAndAlert(ILogger& logger, BatteryCharacter batteryChar, double temperatureInC);
+	BreachType checkAndAlert(ILogger& logger, BatteryCharacter batteryChar, double temperatureInC);
 };
